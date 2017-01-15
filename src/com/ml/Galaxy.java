@@ -9,8 +9,8 @@ public class Galaxy extends JPanel implements Runnable {
     public static final int WIDTH = 500;//1920;
     public static final int HEIGHT = 500;//1080;
     public static final double DELTA = 0.1;
+    public static final double DAYS = 365;
 
-    private int numberOfDays = 365;
     private Sun sun;
     private java.util.List<Planet> planets = new ArrayList<>();
 
@@ -107,9 +107,25 @@ public class Galaxy extends JPanel implements Runnable {
         return Math.sqrt(Math.pow(p2.x - p1.x, 2.0) + Math.pow(p2.y - p1.y, 2.0));
     }
 
-    public boolean positiveOrientation(Point p1, Point p2, Point p3) {
-        return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY())
-                - (p1.getY() - p3.getY()) * (p2.getX() - p3.getX()) >= 0;
+    private enum ORIENTATION {
+        POSITIVE, NEGATIVE;
+    }
+
+    public ORIENTATION orientation(Point p1, Point p2, Point p3) {
+        if ((p1.getX() - p3.getX()) * (p2.getY() - p3.getY())
+                - (p1.getY() - p3.getY()) * (p2.getX() - p3.getX()) >= 0) {
+            return ORIENTATION.POSITIVE;
+        } else {
+            return ORIENTATION.NEGATIVE;
+        }
+    }
+
+    public boolean pointInTriangle(Point pt, Point v1, Point v2, Point v3) {
+        ORIENTATION planetsOrientation = orientation(v1, v2, v3);
+
+        return (planetsOrientation.equals(orientation(v1, v2, pt))
+                && planetsOrientation.equals(orientation(v1, pt, v3))
+                && planetsOrientation.equals(orientation(pt, v2, v3)));
     }
 
     @Override
@@ -120,8 +136,10 @@ public class Galaxy extends JPanel implements Runnable {
         int countDroughtPeriod = 0;
         int countOptimalConditions = 0;
         double maxPerimeter = 0;
+        int day = 0;
+        int count = 1;
 
-        while (numberOfDays-->0) {
+        while (count++ <= DAYS) {
 
              if (isDroughtPeriod(planets.get(0).getPoint(),
                      planets.get(1).getPoint(),
@@ -136,45 +154,8 @@ public class Galaxy extends JPanel implements Runnable {
                     new Point(sun.getPoint()))) {
                 countOptimalConditions++;
             } else {
-               if  (
-                       (( positiveOrientation(planets.get(0).getPoint(),
-                        planets.get(1).getPoint(),
-                        planets.get(2).getPoint())
-&&
-                positiveOrientation(planets.get(0).getPoint(),
-                        planets.get(1).getPoint(),
-                        sun.getPoint())
-&&
-                positiveOrientation(planets.get(0).getPoint(),
-                        sun.getPoint(),
-                        planets.get(2).getPoint())
-&&
-                positiveOrientation(sun.getPoint(),
-                        planets.get(1).getPoint(),
-                        planets.get(2).getPoint())
-
-               )) ||
-
-                (( !positiveOrientation(planets.get(0).getPoint(),
-                        planets.get(1).getPoint(),
-                        planets.get(2).getPoint())
-                        &&
-                        !positiveOrientation(planets.get(0).getPoint(),
-                                planets.get(1).getPoint(),
-                                sun.getPoint())
-                        &&
-                        !positiveOrientation(planets.get(0).getPoint(),
-                                sun.getPoint(),
-                                planets.get(2).getPoint())
-                        &&
-                        !positiveOrientation(sun.getPoint(),
-                                planets.get(1).getPoint(),
-                                planets.get(2).getPoint())
-
-                ))
-
-                )
-                {
+               if (pointInTriangle(sun.getPoint(), planets.get(0).getPoint(),
+                       planets.get(1).getPoint(), planets.get(2).getPoint())) {
                     System.out.println("dentro");
                    double aux = distance(planets.get(0).getPoint(), planets.get(1).getPoint())
                            + distance(planets.get(1).getPoint(), planets.get(2).getPoint())
@@ -188,17 +169,18 @@ public class Galaxy extends JPanel implements Runnable {
                        System.out.println("dist3 = "
                                + distance(planets.get(0).getPoint(), planets.get(2).getPoint()));
                        maxPerimeter = aux;
+                       day = count;
                    }
                } else {
                    System.out.println("fuera!!!!!!!!!!!!!!!!!!!!!!");
                }
             }
 
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             grade = grade + 1;
             grade1 = grade1 + 3;
@@ -214,5 +196,6 @@ public class Galaxy extends JPanel implements Runnable {
         System.out.println("countOptimalConditions = " + countOptimalConditions);
         System.out.println("countDroughtPeriod = " + countDroughtPeriod);
         System.out.println("maxPerimeter = " + maxPerimeter);
+        System.out.println("day = " + day);
     }
 }
