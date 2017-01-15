@@ -2,13 +2,15 @@ package com.ml;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Galaxy extends JPanel implements Runnable {
-    public static final int WIDTH = 1920;
-    public static final int HEIGHT = 1080;
+    public static final int WIDTH = 500;//1920;
+    public static final int HEIGHT = 500;//1080;
+    public static final double DELTA = 0.1;
 
-    private int numberOfDays = 20;
+    private int numberOfDays = 365;
     private Sun sun;
     private java.util.List<Planet> planets = new ArrayList<>();
 
@@ -70,15 +72,130 @@ public class Galaxy extends JPanel implements Runnable {
         this.planets.get(2).simulateDay(angle);
     }
 
+    // Math.abs(a-b) < delta
+    public boolean isDroughtPeriod(Point p1, Point p2, Point p3, Point p4) {
+        double m12 = slope(p1, p2);
+        double m23 = slope(p2, p3);
+        double m34 = slope(p3, p4);
+
+        if ( Math.abs(m12-m23) < DELTA && Math.abs(m23-m34) < DELTA) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean optimalConditions(Point p1, Point p2, Point p3, Point p4) {
+        double m12 = slope(p1, p2);
+        double m23 = slope(p2, p3);
+        double m34 = slope(p3, p4);
+
+        if ( Math.abs(m12-m23) < DELTA && Math.abs(m23-m34) >= DELTA) {
+//        if (slope(p1, p2) == slope(p2, p3)
+//                && slope(p2, p3) != slope(p3, p4)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public double slope(Point p1, Point p2) {
+        return (p2.getY() - p1.getY()) / (p2.getX() - p1.getX());
+    }
+
+    public double distance(Point p1, Point p2) {
+        return Math.sqrt(Math.pow(p2.x - p1.x, 2.0) + Math.pow(p2.y - p1.y, 2.0));
+    }
+
+    public boolean positiveOrientation(Point p1, Point p2, Point p3) {
+        return (p1.getX() - p3.getX()) * (p2.getY() - p3.getY())
+                - (p1.getY() - p3.getY()) * (p2.getX() - p3.getX()) >= 0;
+    }
+
     @Override
     public void run() {
         int grade = 0;
         int grade1 = 0;
         int grade2 = 0;
+        int countDroughtPeriod = 0;
+        int countOptimalConditions = 0;
+        double maxPerimeter = 0;
 
         while (numberOfDays-->0) {
+
+             if (isDroughtPeriod(planets.get(0).getPoint(),
+                     planets.get(1).getPoint(),
+                     planets.get(2).getPoint(),
+                     new Point(sun.getPoint()))) {
+                 countDroughtPeriod++;
+             } else
+
+            if (optimalConditions(planets.get(0).getPoint(),
+                    planets.get(1).getPoint(),
+                    planets.get(2).getPoint(),
+                    new Point(sun.getPoint()))) {
+                countOptimalConditions++;
+            } else {
+               if  (
+                       (( positiveOrientation(planets.get(0).getPoint(),
+                        planets.get(1).getPoint(),
+                        planets.get(2).getPoint())
+&&
+                positiveOrientation(planets.get(0).getPoint(),
+                        planets.get(1).getPoint(),
+                        sun.getPoint())
+&&
+                positiveOrientation(planets.get(0).getPoint(),
+                        sun.getPoint(),
+                        planets.get(2).getPoint())
+&&
+                positiveOrientation(sun.getPoint(),
+                        planets.get(1).getPoint(),
+                        planets.get(2).getPoint())
+
+               )) ||
+
+                (( !positiveOrientation(planets.get(0).getPoint(),
+                        planets.get(1).getPoint(),
+                        planets.get(2).getPoint())
+                        &&
+                        !positiveOrientation(planets.get(0).getPoint(),
+                                planets.get(1).getPoint(),
+                                sun.getPoint())
+                        &&
+                        !positiveOrientation(planets.get(0).getPoint(),
+                                sun.getPoint(),
+                                planets.get(2).getPoint())
+                        &&
+                        !positiveOrientation(sun.getPoint(),
+                                planets.get(1).getPoint(),
+                                planets.get(2).getPoint())
+
+                ))
+
+                )
+                {
+                    System.out.println("dentro");
+                   double aux = distance(planets.get(0).getPoint(), planets.get(1).getPoint())
+                           + distance(planets.get(1).getPoint(), planets.get(2).getPoint())
+                           + distance(planets.get(0).getPoint(), planets.get(2).getPoint());
+
+                   if (aux > maxPerimeter) {
+                       System.out.println("dist1 = "
+                               + distance(planets.get(0).getPoint(), planets.get(1).getPoint()));
+                       System.out.println("dist2 = "
+                               + distance(planets.get(1).getPoint(), planets.get(2).getPoint()));
+                       System.out.println("dist3 = "
+                               + distance(planets.get(0).getPoint(), planets.get(2).getPoint()));
+                       maxPerimeter = aux;
+                   }
+               } else {
+                   System.out.println("fuera!!!!!!!!!!!!!!!!!!!!!!");
+               }
+            }
+
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -93,5 +210,9 @@ public class Galaxy extends JPanel implements Runnable {
 
             this.repaint();
         }
+
+        System.out.println("countOptimalConditions = " + countOptimalConditions);
+        System.out.println("countDroughtPeriod = " + countDroughtPeriod);
+        System.out.println("maxPerimeter = " + maxPerimeter);
     }
 }

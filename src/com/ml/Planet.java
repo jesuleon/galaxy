@@ -9,8 +9,8 @@ public class Planet {
     public static final int WIDTH = 10;
     public static final int HEIGHT = 10;
 
-    public static final int X_CENTER = 1920/2;
-    public static final int Y_CENTER = 1080/2;
+    public static final int X_CENTER = 500/2;
+    public static final int Y_CENTER = 500/2;
 
     private int x;
     private int y;
@@ -43,6 +43,18 @@ public class Planet {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public Point getPoint() {
+        return new Point(x, y);
     }
 
     public void simulateDay(int grade) {
