@@ -131,6 +131,7 @@ public class Galaxy extends JPanel implements Runnable {
         int grade2 = 0;
         int countDroughtPeriod = 0;
         int countOptimalConditions = 0;
+        int countRainingPeriod = 0;
         double maxPerimeter = 0;
         int day = 0;
         int count = 1;
@@ -142,6 +143,7 @@ public class Galaxy extends JPanel implements Runnable {
                      planets.get(2).getPoint(),
                      new Point(sun.getPoint()))) {
                  countDroughtPeriod++;
+                 System.out.println("clima seco");
              } else
 
             if (optimalConditions(planets.get(0).getPoint(),
@@ -149,10 +151,15 @@ public class Galaxy extends JPanel implements Runnable {
                     planets.get(2).getPoint(),
                     new Point(sun.getPoint()))) {
                 countOptimalConditions++;
+                System.out.println("clima óptimo");
+
             } else {
                if (pointInTriangle(sun.getPoint(), planets.get(0).getPoint(),
                        planets.get(1).getPoint(), planets.get(2).getPoint())) {
-                    System.out.println("dentro");
+                   countRainingPeriod++;
+
+                   System.out.println("clima lluvioso");
+
                    double aux = distance(planets.get(0).getPoint(), planets.get(1).getPoint())
                            + distance(planets.get(1).getPoint(), planets.get(2).getPoint())
                            + distance(planets.get(0).getPoint(), planets.get(2).getPoint());
@@ -168,15 +175,15 @@ public class Galaxy extends JPanel implements Runnable {
                        day = count;
                    }
                } else {
-                   System.out.println("fuera!!!!!!!!!!!!!!!!!!!!!!");
+                   System.out.println("clima normal");
                }
             }
 
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             grade = grade + 1;
             grade1 = grade1 + 3;
@@ -191,6 +198,7 @@ public class Galaxy extends JPanel implements Runnable {
 
         System.out.println("countOptimalConditions = " + countOptimalConditions);
         System.out.println("countDroughtPeriod = " + countDroughtPeriod);
+        System.out.println("countRainingPeriod = " + countRainingPeriod);
         System.out.println("maxPerimeter = " + maxPerimeter);
         System.out.println("day = " + day);
     }
