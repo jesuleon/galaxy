@@ -2,12 +2,11 @@ package com.ml;
 
 import javax.swing.*;
 import java.awt.*;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
 
 public class Galaxy extends JPanel implements Runnable {
-    public static final int WIDTH = 500;//1920;
-    public static final int HEIGHT = 500;//1080;
+    public static final int WIDTH = 500;
+    public static final int HEIGHT = 500;
     public static final double DELTA = 0.1;
     public static final double DAYS = 365;
 
@@ -72,7 +71,6 @@ public class Galaxy extends JPanel implements Runnable {
         this.planets.get(2).simulateDay(angle);
     }
 
-    // Math.abs(a-b) < delta
     public boolean isDroughtPeriod(Point p1, Point p2, Point p3, Point p4) {
         double m12 = slope(p1, p2);
         double m23 = slope(p2, p3);
@@ -91,8 +89,6 @@ public class Galaxy extends JPanel implements Runnable {
         double m34 = slope(p3, p4);
 
         if ( Math.abs(m12-m23) < DELTA && Math.abs(m23-m34) >= DELTA) {
-//        if (slope(p1, p2) == slope(p2, p3)
-//                && slope(p2, p3) != slope(p3, p4)) {
             return true;
         } else {
             return false;
